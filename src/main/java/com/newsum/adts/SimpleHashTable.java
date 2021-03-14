@@ -38,6 +38,27 @@ public class SimpleHashTable {
     }
   }
 
+  public Employee remove(String key){
+    int hashedKey = findKey(key);
+    if (hashedKey == -1){
+      return null;
+    }
+
+    Employee employee = hashTable[hashedKey].employee;
+    hashTable[hashedKey] = null;
+
+    // rehash elements in backing array to avoid problem retrieving subsequent elements
+    StoredEmployee[] oldHashtable = hashTable;
+    hashTable = new StoredEmployee[oldHashtable.length];
+    for (int i = 0; i < oldHashtable.length; i++){
+      if ( oldHashtable[i] != null){
+        put(oldHashtable[i].key,oldHashtable[i].employee);
+      }
+    }
+
+    return employee;
+  }
+
   private int findKey(String key){
     int hashedKey = hashKey(key);
 
@@ -59,12 +80,11 @@ public class SimpleHashTable {
       hashedKey = (hashedKey + 1) % hashTable.length; // hash function with incrementation
     }
 
-    if (stopIndex == hashedKey){
-      return -1; // hashedKey not found
-    } else {
+    if (hashTable[hashedKey] != null && hashTable[hashedKey].key.equals(key)){
       return hashedKey;
+    } else {
+      return -1; // hashedKey not found
     }
-
   }
 
   public Employee get(String key){
@@ -105,9 +125,13 @@ public class SimpleHashTable {
     ht.put("Doe",new Employee("John","Doe",2));
     ht.put("Wilson",new Employee("Mike","Wilson",3));
     ht.put("Smith",new Employee("Bill","Smith",4)); // will cause collision with Jane Jones because Jones and Smith are the same length.
+    System.out.println("Hashtable after adding Employees");
     ht.printHashtable();
 
+    ht.remove("Jones");
+    ht.printHashtable();
+    System.out.println("Hashtable after removing Jane");
     Employee billSmith = ht.get("Smith");
-    System.out.println(ht.get("Smith"));
+    System.out.println(billSmith);
   }
 }
