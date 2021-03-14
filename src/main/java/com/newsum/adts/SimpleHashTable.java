@@ -2,31 +2,82 @@ package com.newsum.adts;
 
 import com.newsum.model.Employee;
 
+import java.awt.Stroke;
+
 public class SimpleHashTable {
-  private Employee[] hashTable;
+  private StoredEmployee[] hashTable;
 
   public SimpleHashTable(){
-    hashTable = new Employee[10];
+    hashTable = new StoredEmployee[10];
   }
 
   public void put(String key, Employee employee){
     int hashedKey = hashKey(key);
+
+    if (occupied(hashedKey)) {
+      int stopIndex = hashedKey;
+
+      // will loop around array until an empty index is found.
+      // linear probing
+      if (hashedKey == hashTable.length - 1) {
+        hashedKey = 0;
+      } else {
+        hashedKey++;
+      }
+
+      while (occupied(hashedKey) && hashedKey != stopIndex) {
+        hashedKey = (hashedKey + 1) % hashTable.length;
+      }
+    }
+
     // implementation does not handle collisions
-    if (hashTable[hashedKey] != null){
+    if (occupied(hashedKey)){
       System.out.println("Sorry, there's already an employee at position "+ hashedKey);
     } else {
-      hashTable[hashedKey] = employee;
+      hashTable[hashedKey] = new StoredEmployee(key, employee);
     }
+  }
+
+  private int findKey(String key){
+    int hashedKey = hashKey(key);
+
+    if (hashTable[hashedKey] != null && hashTable[hashedKey].key.equals(key)){
+      return hashedKey;
+    }
+
+    int stopIndex = hashedKey;
+
+    // will loop around array until an empty index is found.
+    // linear probing
+    if (hashedKey == hashTable.length - 1) {
+      hashedKey = 0;
+    } else {
+      hashedKey++;
+    }
+
+    while (hashedKey != stopIndex && hashTable[hashedKey] != null && !hashTable[hashedKey].key.equals(key)) {
+      hashedKey = (hashedKey + 1) % hashTable.length; // hash function with incrementation
+    }
+
+    if (stopIndex == hashedKey){
+      return -1; // hashedKey not found
+    } else {
+      return hashedKey;
+    }
+
   }
 
   public Employee get(String key){
     // element can be retrieved in constant time complexity O(1) if key is known.
-    int hashedKey = hashKey(key);
-    return hashTable[hashedKey];
+    int hashedKey = findKey(key);
+    if (hashedKey == -1 ){
+      return null;
+    }
+    return hashTable[hashedKey].employee;
   }
 
   public void printHashtable(){
-    for (Employee e : hashTable){
+    for (StoredEmployee e : hashTable){
       System.out.println(e);
     }
   }
@@ -44,16 +95,19 @@ public class SimpleHashTable {
      */
   }
 
+  private boolean occupied(int index){
+    return hashTable[index] != null;
+  }
+
   public static void main(String args[]){
     SimpleHashTable ht = new SimpleHashTable();
     ht.put("Jones", new Employee("Jane","Jones",1));
     ht.put("Doe",new Employee("John","Doe",2));
     ht.put("Wilson",new Employee("Mike","Wilson",3));
-
-    // will cause collision
-    ht.put("Doe",new Employee("Jane","Doe",4));
+    ht.put("Smith",new Employee("Bill","Smith",4)); // will cause collision with Jane Jones because Jones and Smith are the same length.
     ht.printHashtable();
 
-    System.out.println(ht.get("Wilson"));
+    Employee billSmith = ht.get("Smith");
+    System.out.println(ht.get("Smith"));
   }
 }
