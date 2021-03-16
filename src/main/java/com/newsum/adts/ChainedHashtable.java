@@ -2,8 +2,13 @@ package com.newsum.adts;
 
 import com.newsum.model.Employee;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
+import java.util.Set;
 
 public class ChainedHashtable {
 
@@ -109,5 +114,36 @@ public class ChainedHashtable {
     ht.remove("Jones");
     ht.printHashtable();
     System.out.println("Retrieve key Smith: "+ ht.get("Smith"));
+
+    // removing duplicates from linked list
+    List<Employee> employees = new LinkedList<>();
+    employees.add(janeJones);
+    employees.add(johnDoe);
+    employees.add(marySmith);
+    employees.add(marySmith);
+    employees.add(janeJones);
+    employees.add(mikeWilson);
+    System.out.println(employees);
+
+    Map<Employee,Employee> employeeMap = new HashMap<>();
+
+    ListIterator<Employee> iterator = employees.listIterator();
+
+    Set<Employee> duplicates = new HashSet<>();
+
+    // remove duplicates
+    while (iterator.hasNext()){
+      Employee employee = iterator.next();
+      employee = employeeMap.putIfAbsent(employee,employee);
+      if (employee != null){
+        duplicates.add(employee);
+      }
+    }
+
+    System.out.println();
+    System.out.println("Before duplicates removed: "+employees);
+    employees = new LinkedList<>(employeeMap.keySet());
+    System.out.println("After duplicates removed: "+employees);
+    System.out.println("Duplicates: "+duplicates);
   }
 }
