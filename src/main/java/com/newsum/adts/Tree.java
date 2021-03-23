@@ -17,6 +17,12 @@ public class Tree {
     }
   }
 
+  public void traversePreOrder(){
+    if (root != null) {
+      root.traversePreOrder();
+    }
+  }
+
   public TreeNode get(int value){
     if (root != null){
       return root.get(value);
@@ -103,8 +109,12 @@ public class Tree {
 
     // print max
     System.out.println("Max: "+inTree.max());
-    
-    inTree.delete(25);
+
+    //inTree.delete(25);
     inTree.traverseInOrder();
+
+    // pre-order traversal
+    System.out.println();
+    inTree.traversePreOrder();
   }
 }
